@@ -12,7 +12,7 @@ def branch_filter(branch):
 for repo, branch in get_repositories_and_branches(branch_filter=branch_filter):
     subprocess.check_call([
         '/usr/local/bin/wocg-create-project',
-        '--repository', 'https://github.com/OCA/' + repo,
+        '--repository', 'https://github.com/aurestic/' + repo,
         '--branch', branch,
         '--tmpl-component-slug', '0-oca-project-template-addon',
     ])

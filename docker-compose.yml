@@ -1,10 +1,12 @@
-version: '2'
+version: '2.3'
 services:
   weblate:
     build: .
-    image: weblate-oca
-    ports:
-      - 8001:8080
+    image: weblate-aurestic
+    networks:
+      - proxy-network
+      - postgres-network
+      - redis-network
     tmpfs:
       - /app/cache
     volumes:
@@ -12,18 +14,17 @@ services:
     env_file:
       - ./environment
     restart: unless-stopped
-    depends_on:
-      - cache
-  cache:
-    image: redis:6-alpine
-    restart: unless-stopped
-    # AFE 20191202: add no appendfsynconrewrite and auto aof rewrite min size options
-    #command: ["redis-server", "--appendonly", "yes", "--no-appendfsync-on-rewrite", "yes", "--auto-aof-rewrite-min-size", "128mb"]
-    # SBI 20221016: use redis command from https://github.com/WeblateOrg/docker-compose/blob/main/docker-compose-https.yml
-    command: [redis-server, --save, '60', '1']
-    volumes:
-      - ./data/redis:/data
+    labels:
+      - traefik.enable=true
+      - traefik.port=8080
+      - traefik.frontend.rule=Host:${WEBLATE_SITE_DOMAIN:-weblate.aurestic.com}
+      - traefik.frontend.passHostHeader=true
+      - traefik.docker.network=proxy-network
+
 networks:
-  default:
-    external:
-      name: weblate
+  proxy-network:
+    external: true
+  postgres-network:
+    external: true
+  redis-network:
+    external: true
