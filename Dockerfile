@@ -11,6 +11,10 @@ RUN python3 -m venv /opt/oca-maintainer-tools && \
 
 COPY wocg-oca /usr/local/bin/
 
+COPY weblate_customization /usr/src/weblate_customization
+RUN pip install --no-cache-dir /usr/src/weblate_customization
+ENV DJANGO_SETTINGS_MODULE=weblate_customization.settings
+
 USER 1000
 
 CMD ["runserver"]
